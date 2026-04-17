@@ -1,0 +1,46 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:native}
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:/app/config-repo,file:/app/config-repo/{application}
+        git:
+          uri: ${GIT_CONFIG_URI:}
+          default-label: ${GIT_CONFIG_LABEL:main}
+          search-paths: "/**"
+          clone-on-start: true
+        vault:
+          host: ${VAULT_HOST:vault-server}
+          port: ${VAULT_PORT:8201}
+          scheme: ${VAULT_SCHEME:http}
+          authentication: TOKEN
+          token: ${VAULT_TOKEN:changeme}
+          kv-version: 2
+          backend: secret
+          profile-separator: /
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka-server:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: config-server
+    prefer-ip-address: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,busrefresh
+  endpoint:
+    health:
+      show-details: always
